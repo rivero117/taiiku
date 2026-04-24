@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>音当てゲーム</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      padding: 50px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #result {
+      font-size: 28px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>この和音は何？</h1>
+
+<button onclick="playChord()">和音を再生</button><br>
+
+<input type="text" id="answer" placeholder="答えを入力">
+<button onclick="check()">判定</button>
+
+<div id="result"></div>
+
+<script>
+let audioCtx;
+
+function playChord() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // F#4 = 約369.99Hz
+  // A4 = 440Hz
+  const freqs = [370, 440];
+
+  freqs.forEach(freq => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.frequency.value = freq;
+    osc.type = "sine";
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.5);
+  });
+}
+
+function check() {
+  const input = document.getElementById("answer").value.trim().toLowerCase();
+  const result = document.getElementById("result");
+
+  // 正解パターン（自由に追加可能）
+  if (
+    input === "f#m" ||
+    input === "f# minor" ||
+    input === "fシャープマイナー"
+  ) {
+    result.textContent = "CLEAR";
+  } else {
+    result.textContent = "ONE MORE TRY";
+  }
+}
+</script>
+
+</body>
+</html>
