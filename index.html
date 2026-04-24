@@ -35,7 +35,7 @@
 
 <button onclick="playChord()">和音を再生</button><br>
 
-<input type="text" id="answer" placeholder="ドとミみたいに書いてね🍝">
+<input type="text" id="answer" placeholder="音階を描いてね">
 <button onclick="check()">判定</button>
 
 <div id="result"></div>
@@ -43,33 +43,42 @@
 <script>
 let audioCtx;
 
+function playNote(freq) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  // ピアノっぽくするためtriangle波＋軽い倍音感
+  osc.type = "triangle";
+  osc.frequency.value = freq;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  const now = audioCtx.currentTime;
+
+  // アタック→減衰（ピアノ風）
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.4, now + 0.02); // アタック
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 2.0); // 減衰
+
+  osc.start(now);
+  osc.stop(now + 2.0);
+}
+
 function playChord() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  // ファ#（F#4 ≒ 370Hz）とラ（A4 = 440Hz）
-  const freqs = [370, 440];
+  // D3（下のレ）≈146.83Hz
+  // F#4 ≈370Hz
+  // A4 = 440Hz
+  const freqs = [147, 370, 440];
 
-  freqs.forEach(freq => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.frequency.value = freq;
-    osc.type = "sine";
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-
-    osc.start();
-    osc.stop(audioCtx.currentTime + 1.5);
-  });
+  freqs.forEach(freq => playNote(freq));
 }
 
 function check() {
   let input = document.getElementById("answer").value.trim();
 
-  // 表記ゆれ対策
   input = input
     .toLowerCase()
     .replace(/♯/g, "#")
@@ -78,10 +87,11 @@ function check() {
   const result = document.getElementById("result");
 
   if (
-    input === "ファ#とラ" ||
-    input === "ファ#ラ" ||
-    input === "f#a" ||
-    input === "f#とa"
+    input === "レファ#ラ" ||
+    input === "レとファ#とラ" ||
+    input === "dfa#" ||
+    input === "dメジャー" ||
+    input === "dmajor"
   ) {
     result.textContent = "CLEAR";
   } else {
