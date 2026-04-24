@@ -35,7 +35,7 @@
 
 <button onclick="playChord()">和音を再生</button><br>
 
-<input type="text" id="answer" placeholder="答えを入力">
+<input type="text" id="answer" placeholder="ドとミみたいに書いてね🍝">
 <button onclick="check()">判定</button>
 
 <div id="result"></div>
@@ -46,8 +46,7 @@ let audioCtx;
 function playChord() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  // F#4 = 約369.99Hz
-  // A4 = 440Hz
+  // ファ#（F#4 ≒ 370Hz）とラ（A4 = 440Hz）
   const freqs = [370, 440];
 
   freqs.forEach(freq => {
@@ -68,14 +67,21 @@ function playChord() {
 }
 
 function check() {
-  const input = document.getElementById("answer").value.trim().toLowerCase();
+  let input = document.getElementById("answer").value.trim();
+
+  // 表記ゆれ対策
+  input = input
+    .toLowerCase()
+    .replace(/♯/g, "#")
+    .replace(/\s+/g, "");
+
   const result = document.getElementById("result");
 
-  // 正解パターン（自由に追加可能）
   if (
-    input === "f#m" ||
-    input === "f# minor" ||
-    input === "fシャープマイナー"
+    input === "ファ#とラ" ||
+    input === "ファ#ラ" ||
+    input === "f#a" ||
+    input === "f#とa"
   ) {
     result.textContent = "CLEAR";
   } else {
