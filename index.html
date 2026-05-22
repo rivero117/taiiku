@@ -1,105 +1,269 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>音当てゲーム</title>
-  <style>
-    body {
-      text-align: center;
-      font-family: sans-serif;
-      padding: 50px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体育祭・体育用 ROULETTE</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #00f2fe; 
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --special-color: #ff4757; 
+            --special-glow: rgba(255, 71, 87, 0.6);
+            --text-color: #f0f6fc;
+        }
 
-    input {
-      padding: 10px;
-      font-size: 16px;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            letter-spacing: 0.05em;
+            transition: background-color 0.5s;
+        }
 
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        body.panic {
+            background-color: #1a080a;
+        }
 
-    #result {
-      font-size: 28px;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
+        .container {
+            width: 90%;
+            max-width: 650px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #8b949e;
+            margin-bottom: 40px;
+            letter-spacing: 0.2em;
+        }
+
+        /* 2列に変更 */
+        .slot-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 50px;
+            transition: all 0.5s ease;
+        }
+
+        /* 合体時 */
+        .slot-wrapper.merged {
+            grid-template-columns: 1fr;
+        }
+
+        .slot-box {
+            background-color: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .slot-box.hide {
+            display: none;
+        }
+
+        .slot-box.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .slot-box.special-active {
+            border-color: var(--special-color);
+            box-shadow: 0 0 30px var(--special-glow);
+            height: 180px;
+            animation: megaGlow 1s infinite alternate;
+        }
+
+        @keyframes megaGlow {
+            0% { box-shadow: 0 0 15px var(--special-glow); }
+            100% { box-shadow: 0 0 35px var(--special-color); }
+        }
+
+        .slot-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-color);
+            padding: 0 10px;
+            line-height: 1.4;
+        }
+
+        .slot-box.special-active .slot-text {
+            font-size: 2rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--special-color);
+        }
+
+        .spinning {
+            animation: cyberBlur 0.08s infinite linear;
+        }
+
+        @keyframes cyberBlur {
+            0% { transform: translateY(-8px); filter: blur(2px); opacity: 0.7; }
+            50% { transform: translateY(8px); filter: blur(4px); opacity: 0.4; }
+            100% { transform: translateY(-8px); filter: blur(2px); opacity: 0.7; }
+        }
+
+        .action-btn {
+            background: none;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 16px 50px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 25px var(--accent-color);
+        }
+
+        .action-btn:disabled {
+            border-color: #30363d;
+            color: #8b949e;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            .slot-wrapper:not(.merged) {
+                grid-template-columns: 1fr;
+            }
+            .slot-box { height: 100px; }
+            .slot-box.special-active { height: 140px; }
+            .slot-box.special-active .slot-text { font-size: 1.5rem; }
+        }
+    </style>
 </head>
 <body>
 
-<h1>この和音は何？</h1>
+    <div class="container">
+        <h1>PE Class Mission</h1>
+        
+        <div id="wrapper" class="slot-wrapper">
+            <div id="box1" class="slot-box">
+                <div id="slot1" class="slot-text">---</div>
+            </div>
+            <div id="box2" class="slot-box">
+                <div id="slot2" class="slot-text">---</div>
+            </div>
+        </div>
+        
+        <button id="spin-btn" class="action-btn" onclick="startSlot()">Spin</button>
+    </div>
 
-<button onclick="playChord()">和音を再生</button><br>
+    <script>
+        // 体育の授業用：お題リスト①（髪型や見た目など）
+        const list1 = [
+            "ショートヘアの",
+            "ロングヘアの",
+            "髪を縛っている",
+            "メガネをかけている",
+            "前髪を上げている",
+            "まだ余裕で元気そうな",
+            "ちょっとバテてそうな"
+        ];
 
-<input type="text" id="answer" placeholder="音階を描いてね">
-<button onclick="check()">判定</button>
+        // 体育の授業用：お題リスト②（体操服や靴、ゼッケンなど）
+        const list2 = [
+            "ハーフパンツを履いた人",
+            "長ズボンのジャージの人",
+            "白いスニーカーの人",
+            "黒以外のな靴の人",
+            "出席番号が奇数の人",
+            "半袖の体操服の人"
+        ];
 
-<div id="result"></div>
+        // 🔥 特別ルール（体育用の全員巻き込み系）
+        const specialList = [
+            "🚨 その場の「ゆうた」全員！",
+            "🚨 今月誕生日の人",
+            "🚨 ゆなさんつれておいで！",
+            "🚨 君が思う「美女」2人",
+            "🚨 誕生日が「奇数月」の人全員！",
+            "🚨 この場で一番身長高い人！"
+        ];
 
-<script>
-let audioCtx;
+        function startSlot() {
+            const btn = document.getElementById('spin-btn');
+            btn.disabled = true;
 
-function playNote(freq) {
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+            const s1 = document.getElementById('slot1');
+            const s2 = document.getElementById('slot2');
+            const b1 = document.getElementById('box1');
+            const b2 = document.getElementById('box2');
+            const wrapper = document.getElementById('wrapper');
 
-  // ピアノっぽくするためtriangle波＋軽い倍音感
-  osc.type = "triangle";
-  osc.frequency.value = freq;
+            // リセット
+            document.body.classList.remove('panic');
+            wrapper.classList.remove('merged');
+            [b1, b2].forEach(b => b.classList.remove('active', 'special-active', 'hide'));
 
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
+            // 25%の確率で特別ルール
+            const isSpecial = Math.random() < 0.25; 
 
-  const now = audioCtx.currentTime;
+            s1.classList.add('spinning');
+            s2.classList.add('spinning');
 
-  // アタック→減衰（ピアノ風）
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.4, now + 0.02); // アタック
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 2.0); // 減衰
+            const interval1 = setInterval(() => { s1.innerText = list1[Math.floor(Math.random() * list1.length)]; }, 60);
+            const interval2 = setInterval(() => { s2.innerText = list2[Math.floor(Math.random() * list2.length)]; }, 60);
 
-  osc.start(now);
-  osc.stop(now + 2.0);
-}
+            if (isSpecial) {
+                const chosenSpecial = specialList[Math.floor(Math.random() * specialList.length)];
+                setTimeout(() => {
+                    clearInterval(interval1);
+                    clearInterval(interval2);
+                    s1.classList.remove('spinning');
+                    s2.classList.remove('spinning');
 
-function playChord() {
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    // 2つの箱を1つに合体！
+                    document.body.classList.add('panic');
+                    wrapper.classList.add('merged');
+                    b2.classList.add('hide');
+                    
+                    s1.innerText = chosenSpecial;
+                    b1.classList.add('special-active');
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                // 通常ストップ（左→右）
+                setTimeout(() => {
+                    clearInterval(interval1);
+                    s1.classList.remove('spinning');
+                    b1.classList.add('active');
+                }, 1000);
 
-  // D3（下のレ）≈146.83Hz
-  // F#4 ≈370Hz
-  // A4 = 440Hz
-  const freqs = [147, 370, 440];
-
-  freqs.forEach(freq => playNote(freq));
-}
-
-function check() {
-  let input = document.getElementById("answer").value.trim();
-
-  input = input
-    .toLowerCase()
-    .replace(/♯/g, "#")
-    .replace(/\s+/g, "");
-
-  const result = document.getElementById("result");
-
-  if (
-    //ふーん、そういうことしちゃうのね良くないよ
-    input === "レファ#ラ" ||
-    input === "レとファ#とラ" ||
-    input === "dfa#" ||
-    input === "dメジャー" ||
-    input === "dmajor"
-  ) {
-    result.textContent = "CLEAR";
-  } else {
-    result.textContent = "ONE MORE TRY";
-  }
-}
-</script>
-
+                setTimeout(() => {
+                    clearInterval(interval2);
+                    s2.classList.remove('spinning');
+                    b2.classList.add('active');
+                    btn.disabled = false;
+                }, 1800);
+            }
+        }
+    </script>
 </body>
 </html>
