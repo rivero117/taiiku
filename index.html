@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>体育祭・体育用 ROULETTE</title>
+    <title>たらこすぱげてぃ ROULETTE</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -161,7 +161,7 @@
 <body>
 
     <div class="container">
-        <h1>PE Class Mission</h1>
+        <h1>Borrowing Mission</h1>
         
         <div id="wrapper" class="slot-wrapper">
             <div id="box1" class="slot-box">
@@ -183,7 +183,7 @@
             "髪を縛っている",
             "メガネをかけている",
             "前髪を上げている",
-            "まだ余裕で元気そうな",
+            "自分より身長が高い",
             "ちょっとバテてそうな"
         ];
 
@@ -199,7 +199,6 @@
 
         // 🔥 特別ルール（体育用の全員巻き込み系）
         const specialList = [
-            "🚨 その場の「ゆうた」全員！",
             "🚨 今月誕生日の人",
             "🚨 ゆなさんつれておいで！",
             "🚨 君が思う「美女」2人",
@@ -222,8 +221,8 @@
             wrapper.classList.remove('merged');
             [b1, b2].forEach(b => b.classList.remove('active', 'special-active', 'hide'));
 
-            // 25%の確率で特別ルール
-            const isSpecial = Math.random() < 0.25; 
+            // 20%の確率で特別ルール
+            const isSpecial = Math.random() < 0.20; 
 
             s1.classList.add('spinning');
             s2.classList.add('spinning');
